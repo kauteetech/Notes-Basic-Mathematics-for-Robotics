@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Mathematics Learning Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #5a67d8;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #5a67d8;
+            box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+        }
+
+        .topic-list {
+            list-style: none;
+        }
+
+        .topic-item {
+            margin-bottom: 8px;
+        }
+
+        .topic-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        .topic-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .topic-button.active {
+            background: linear-gradient(135deg, #4c51bf, #553c9a);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .topic-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .topic-button:hover::before {
+            left: 100%;
+        }
+
+        .topic-emoji {
+            font-size: 18px;
+            margin-right: 12px;
+        }
+
+        .topic-count {
+            margin-left: auto;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .topic-title {
+            color: #5a67d8;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .topic-description {
+            color: #718096;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .questions-container {
+            display: none;
+        }
+
+        .questions-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            margin-bottom: 18px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .question-header {
+            padding: 22px;
+            cursor: pointer;
+            border-bottom: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .question-header:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .question-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2d3748;
+            line-height: 1.6;
+            padding-right: 30px;
+        }
+
+        .toggle-icon {
+            position: absolute;
+            right: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #5a67d8;
+            transition: transform 0.3s ease;
+        }
+
+        .question-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .question-content.active {
+            max-height: 600px;
+        }
+
+        .answer-section {
+            padding: 25px;
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+        }
+
+        .correct-answer {
+            background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
+            color: #1a202c;
+            padding: 15px 18px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-weight: 600;
+            border-left: 4px solid #38a169;
+            box-shadow: 0 2px 8px rgba(56, 161, 105, 0.2);
+        }
+
+        .explanation {
+            background: linear-gradient(135deg, #ebf8ff, #bee3f8);
+            color: #1a202c;
+            padding: 18px;
+            border-radius: 10px;
+            line-height: 1.7;
+            border-left: 4px solid #4299e1;
+            box-shadow: 0 2px 8px rgba(66, 153, 225, 0.2);
+        }
+
+        .explanation-label {
+            font-weight: 600;
+            color: #2c5282;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .no-questions {
+            text-align: center;
+            padding: 50px;
+            color: #718096;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-message h2 {
+            color: #5a67d8;
+            font-size: 36px;
+            margin-bottom: 18px;
+        }
+
+        .welcome-message p {
+            color: #718096;
+            font-size: 18px;
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-results {
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #fed7d7, #feb2b2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .question-card.active .toggle-icon {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+                max-height: 400px;
+            }
+            
+            .main-content {
+                order: 1;
+            }
+
+            .topic-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="header">
+                <h1>📊 Math Hub</h1>
+                <p style="color: #718096; font-size: 14px;">Interactive Mathematics Learning</p>
+            </div>
+
+            <div class="search-container">
+                <input type="text" class="search-box" placeholder="Search questions..." id="searchBox">
+                <span class="search-icon">🔍</span>
+            </div>
+
+            <ul class="topic-list" id="topicList">
+                <!-- Topics will be populated by JavaScript -->
+            </ul>
+        </div>
+
+        <div class="main-content" id="mainContent">
+            <div class="welcome-message">
+                <h2>Welcome to Mathematics Learning Hub! 📈</h2>
+                <p>Master essential mathematics concepts through carefully organized topics. Start with vector algebra and progress through each section to build your understanding step by step. Each topic builds upon the previous ones, creating a comprehensive learning journey from basic algebra to advanced topics.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const topics = {
+            'vector-algebra': {
+                title: '📐 Vector Algebra',
+                description: 'Fundamental vector operations, properties, and applications',
+                questions: [
+                    {
+                        question: "In vector algebra, what fundamental property does the addition of two vectors r and s demonstrate?",
+                        answer: "A",
+                        explanation: "Vector addition follows the commutative property, meaning the order of addition doesn't matter: r + s = s + r. This property holds true both algebraically and geometrically. When you move along vector r then s, you reach the same endpoint as moving along s then r. This fundamental principle is essential in vector spaces and forms the basis for many vector operations in physics and engineering."
+                    },
+                    {
+                        question: "For scalar multiplication of a vector r, which property is always satisfied?",
+                        answer: "A",
+                        explanation: "Scalar multiplication of vectors is both associative and commutative, meaning a · r = r · a. When you multiply a vector by a scalar, you're scaling the vector's magnitude while preserving its direction (if positive scalar) or reversing it (if negative scalar). This operation is fundamental in vector algebra and is used extensively in physics for representing quantities like force, velocity, and displacement."
+                    },
+                    {
+                        question: "How do you calculate the magnitude of a 2D vector r = ai + bj?",
+                        answer: "B",
+                        explanation: "The magnitude (or length) of a vector r = ai + bj is calculated using the Pythagorean theorem: |r| = √(a² + b²). This represents the straight-line distance from the origin to the point (a, b) in the coordinate plane. The magnitude is always a non-negative scalar value and gives us the 'size' of the vector regardless of its direction. This calculation is fundamental in determining distances, speeds, and other physical quantities."
+                    },
+                    {
+                        question: "What is the mathematical formula for the dot product of two vectors u and s?",
+                        answer: "B",
+                        explanation: "The dot product of two vectors u and s is defined as u · s = |u||s|cos θ, where θ is the angle between the vectors. This formula combines both the magnitudes of the vectors and the cosine of the angle between them. The dot product results in a scalar value and is used to determine the angle between vectors, project one vector onto another, and test for orthogonality. It's a fundamental operation in vector algebra with applications in physics, computer graphics, and engineering."
+                    },
+                    {
+                        question: "When two vectors are orthogonal (perpendicular), what is the value of their dot product?",
+                        answer: "B",
+                        explanation: "Two vectors are orthogonal (perpendicular) if and only if their dot product equals zero. This follows directly from the dot product formula u · s = |u||s|cos θ: when θ = 90°, cos(90°) = 0, making the entire product zero. This property is extremely useful for testing orthogonality and is fundamental in defining orthogonal coordinate systems, orthogonal projections, and in many applications in linear algebra and geometry."
+                    },
+                    {
+                        question: "How do you calculate the scalar projection of vector s onto vector u?",
+                        answer: "A",
+                        explanation: "The scalar projection of vector s onto vector u is calculated as (u · s) / |u|. This measures how much of vector s lies in the direction of vector u, giving a signed scalar value. If the result is positive, s has a component in the same direction as u; if negative, it's in the opposite direction. This concept is crucial in physics for calculating work done by forces, in computer graphics for lighting calculations, and in many engineering applications."
+                    },
+                    {
+                        question: "What essential property must a set of basis vectors satisfy?",
+                        answer: "B",
+                        explanation: "A set of basis vectors must be linearly independent, meaning no vector in the set can be expressed as a linear combination of the others. This ensures that the basis vectors span the vector space efficiently and that every vector in the space has a unique representation. While orthogonality is desirable for computational convenience, it's not required for a set to form a basis. Linear independence is the fundamental requirement that guarantees the basis can represent all vectors in the space uniquely."
+                    },
+                    {
+                        question: "If basis vectors b₁ and b₂ are orthogonal, what is the value of their dot product?",
+                        answer: "B",
+                        explanation: "When basis vectors b₁ and b₂ are orthogonal, their dot product b₁ · b₂ = 0. Orthogonal basis vectors are perpendicular to each other, which simplifies many calculations in vector spaces. While not required for a basis, orthogonal bases (and especially orthonormal bases where the vectors also have unit length) make computations much easier, particularly for projections and coordinate transformations. This property is extensively used in coordinate systems and signal processing."
+                    },
+                    {
+                        question: "What method is used to represent a vector in terms of a new basis?",
+                        answer: "B",
+                        explanation: "To represent a vector in terms of a new basis, we use vector projections. Each component of the vector in the new basis is found by projecting the original vector onto each basis vector. This process involves calculating the scalar projection of the vector onto each basis vector, which gives the coordinates in the new coordinate system. This technique is fundamental in coordinate transformations, principal component analysis, and many areas of applied mathematics and engineering."
+                    }
+                ]
+            },
+            'matrix-basics': {
+                title: '🔢 Matrix Fundamentals',
+                description: 'Basic matrix operations, properties, and essential concepts',
+                questions: [
+                    {
+                        question: "What fundamental property does the identity matrix I satisfy for any matrix A?",
+                        answer: "A",
+                        explanation: "The identity matrix I satisfies the property that multiplying any matrix A by I leaves A unchanged: AI = A and IA = A. The identity matrix acts like the number 1 in scalar arithmetic, serving as the multiplicative identity in matrix algebra. It has ones on the main diagonal and zeros elsewhere. This property is fundamental to matrix algebra and is essential for defining matrix inverses, solving linear systems, and understanding linear transformations."
+                    },
+                    {
+                        question: "What important property characterizes matrix multiplication?",
+                        answer: "B",
+                        explanation: "Matrix multiplication is associative, meaning (AB)C = A(BC), but it is generally not commutative, meaning AB ≠ BA in most cases. The associative property allows us to multiply several matrices together without worrying about the order of operations, which is crucial for efficient computation. However, the non-commutative nature means we must be careful about the order when multiplying matrices, as changing the order typically changes the result."
+                    },
+                    {
+                        question: "What relationship defines the inverse of a matrix A?",
+                        answer: "A",
+                        explanation: "The inverse of a matrix A, denoted A⁻¹, is defined such that A A⁻¹ = I and A⁻¹ A = I, where I is the identity matrix. Only square matrices that are non-singular (have non-zero determinant) possess inverses. The inverse operation is crucial for solving linear systems, finding solutions to matrix equations, and understanding linear transformations. When a matrix has an inverse, we say it is invertible or non-singular."
+                    },
+                    {
+                        question: "What is the transpose of the matrix [[1,2],[3,4]]?",
+                        answer: "A",
+                        explanation: "The transpose of a matrix is obtained by swapping rows and columns. The element in row i, column j of the original matrix becomes the element in row j, column i of the transpose. So the first row [1,2] becomes the first column [1,3], and the second row [3,4] becomes the second column [2,4]. Matrix transpose is used extensively in linear algebra and optimization problems."
+                    },
+                    {
+                        question: "What is the trace of the matrix [[5,2],[-1,3]]?",
+                        answer: "A",
+                        explanation: "The trace of a matrix is the sum of the elements on the main diagonal. For the matrix [[5,2],[-1,3]], the diagonal elements are 5 and 3, so the trace is 5 + 3 = 8. The trace has important properties: it equals the sum of eigenvalues, is invariant under similarity transformations, and appears in many matrix calculations and theoretical results in linear algebra."
+                    },
+                    {
+                        question: "If A and B are invertible matrices, what is (AB)⁻¹?",
+                        answer: "B",
+                        explanation: "The inverse of a product of matrices follows the reverse order rule: (AB)⁻¹ = B⁻¹A⁻¹. This can be verified by checking that (AB)(B⁻¹A⁻¹) = A(BB⁻¹)A⁻¹ = AIA⁻¹ = AA⁻¹ = I. This property is crucial in solving systems of equations and understanding how transformations compose and decompose. The order reversal is a fundamental property that appears throughout linear algebra."
+                    },
+                    {
+                        question: "What is the trace of a matrix?",
+                        answer: "A",
+                        explanation: "The trace of a square matrix is the sum of the elements on the main diagonal: tr(A) = a₁₁ + a₂₂ + ... + aₙₙ. The trace has important properties: it equals the sum of the eigenvalues, it's invariant under similarity transformations, and it's linear (tr(A + B) = tr(A) + tr(B)). The trace is used in various applications including calculating the characteristic polynomial, analyzing linear transformations, and in advanced topics like matrix calculus."
+                    },
+                    {
+                        question: "What property do orthogonal matrices satisfy?",
+                        answer: "A",
+                        explanation: "Orthogonal matrices satisfy AᵀA = I, where Aᵀ is the transpose of A and I is the identity matrix. This means that the columns (and rows) of an orthogonal matrix form an orthonormal set of vectors. For orthogonal matrices, the transpose equals the inverse: A⁻¹ = Aᵀ. These matrices preserve lengths and angles under transformation, making them important in rotations, reflections, and other isometric transformations in geometry and computer graphics."
+                    }
+                ]
+            },
+            'determinants': {
+                title: '🎯 Determinants & Properties',
+                description: 'Determinant calculation, properties, and applications',
+                questions: [
+                    {
+                        question: "What is the formula for the determinant of a 2×2 matrix [a b; c d]?",
+                        answer: "B",
+                        explanation: "For a 2×2 matrix [a b; c d], the determinant is calculated as det(A) = ad - bc. The determinant provides important information about the matrix: if it's non-zero, the matrix is invertible; if it's zero, the matrix is singular (non-invertible). Geometrically, the absolute value of the determinant represents the area scaling factor when the matrix is viewed as a linear transformation. This concept extends to higher dimensions where it represents volume scaling."
+                    },
+                    {
+                        question: "What does it mean when a matrix has a determinant of zero?",
+                        answer: "B",
+                        explanation: "When a matrix has a determinant of zero, it is called singular, meaning it has no inverse and its rows or columns are linearly dependent. This indicates that the matrix represents a transformation that collapses the space in some direction, reducing its dimensionality. Singular matrices cannot be used to solve unique solutions to linear systems Ax = b, and they represent transformations that are not reversible. Understanding singularity is crucial in linear algebra applications."
+                    },
+                    {
+                        question: "What is the determinant of the diagonal matrix [[3,0],[0,-2]]?",
+                        answer: "A",
+                        explanation: "For diagonal matrices, the determinant is simply the product of the diagonal entries. Here, det([[3,0],[0,-2]]) = 3 × (-2) = -6. This property makes diagonal matrices particularly easy to work with. The determinant tells us about the scaling factor of the linear transformation and whether the matrix is invertible (non-zero determinant means invertible). The negative value indicates that the transformation reverses orientation."
+                    },
+                    {
+                        question: "A matrix with determinant zero is called:",
+                        answer: "B",
+                        explanation: "A matrix with determinant zero is called singular, meaning it has no inverse and its columns (or rows) are linearly dependent. Singular matrices represent transformations that collapse space in some direction, reducing dimensionality. They cannot be used to solve unique solutions to linear systems Ax = b, and understanding singularity is crucial for analyzing the stability and solvability of linear problems in engineering and science."
+                    },
+                    {
+                        question: "For a 3×3 matrix, what does the determinant represent geometrically?",
+                        answer: "B",
+                        explanation: "In 3D space, the determinant of a 3×3 matrix represents the signed volume of the parallelepiped formed by the three column vectors. If the determinant is positive, the vectors form a right-handed coordinate system; if negative, left-handed. The absolute value gives the actual volume. This geometric interpretation extends the 2D concept where determinant represents area, and helps understand how linear transformations scale space in higher dimensions."
+                    },
+                    {
+                        question: "If |A| = 4 and |B| = 3, what is |AB|?",
+                        answer: "B",
+                        explanation: "The determinant of a product equals the product of determinants: |AB| = |A| × |B|. This fundamental property means that |AB| = 4 × 3 = 12. This multiplicative property is crucial for understanding how compositions of linear transformations affect scaling factors and volumes. It also explains why the determinant of an inverse matrix is the reciprocal of the original determinant: |A⁻¹| = 1/|A|."
+                    },
+                    {
+                        question: "Cramer's Rule uses determinants to:",
+                        answer: "B",
+                        explanation: "Cramer's Rule provides an explicit formula for solving linear systems Ax = b using determinants. For each variable xᵢ, the solution is xᵢ = |Aᵢ|/|A|, where Aᵢ is A with the i-th column replaced by b. While computationally expensive for large systems, it's theoretically important and useful for systems with parameters, providing insight into how solutions depend on coefficients and offering exact symbolic solutions."
+                    },
+                    {
+                        question: "A matrix A is invertible if and only if:",
+                        answer: "A",
+                        explanation: "A square matrix is invertible (non-singular) if and only if its determinant is non-zero. This is because the determinant measures whether the transformation represented by A is volume-preserving (and thus reversible). When det(A) = 0, the matrix maps some non-zero vectors to zero, making the transformation irreversible. This fundamental theorem connects determinants, invertibility, and the solvability of linear systems throughout mathematics and engineering."
+                    }
+                ]
+            },
+            'linear-systems': {
+                title: '⚖️ Linear Systems & Matrix Operations',
+                description: 'Solving systems, rank, null space, and advanced matrix concepts',
+                questions: [
+                    {
+                        question: "What is the rank of the matrix [[1,2],[2,4]]?",
+                        answer: "A",
+                        explanation: "The rank of a matrix is the number of linearly independent rows or columns. In this matrix, the second row [2,4] is exactly twice the first row [1,2], making them linearly dependent. Therefore, there is only one linearly independent row, giving the matrix rank 1. Rank determines the dimension of the column space and is crucial for understanding the solvability of linear systems and the invertibility of matrices."
+                    },
+                    {
+                        question: "What does the rank of a matrix represent?",
+                        answer: "A",
+                        explanation: "The rank of a matrix is the number of linearly independent rows or columns in the matrix, which determines the dimension of the column space (or row space). Rank provides crucial information about the matrix: it tells us the dimension of the space spanned by the matrix's columns, the number of free variables in associated linear systems, and whether the matrix has full rank. Understanding rank is essential for solving linear systems and analyzing linear transformations."
+                    },
+                    {
+                        question: "What is the primary use of Gaussian elimination?",
+                        answer: "B",
+                        explanation: "Gaussian elimination is a systematic method for solving systems of linear equations by transforming the augmented matrix to row-echelon form through elementary row operations. It reduces the system to a triangular form that can be solved by back-substitution. This algorithm is fundamental in linear algebra and forms the basis for many computational methods in engineering and scientific computing applications."
+                    },
+                    {
+                        question: "The null space of a matrix A consists of all solutions to which equation?",
+                        answer: "B",
+                        explanation: "The null space (or kernel) of a matrix A is the set of all vectors x that satisfy Ax = 0. These vectors are 'nullified' by the transformation represented by A, meaning they get mapped to the zero vector. The null space is a subspace whose dimension equals the number of free variables in the system, and it's complementary to the column space in understanding the complete behavior of linear transformations."
+                    },
+                    {
+                        question: "What is the inverse of the matrix [[1,1],[0,1]]?",
+                        answer: "A",
+                        explanation: "To find the inverse, we can use the formula A⁻¹ = (1/det(A)) × adj(A), or verify by checking that AA⁻¹ = I. For [[1,1],[0,1]], multiplying by [[1,-1],[0,1]] gives [[1×1+1×0, 1×(-1)+1×1],[0×1+1×0, 0×(-1)+1×1]] = [[1,0],[0,1]] = I. The inverse operation is fundamental for solving matrix equations and understanding reversible linear transformations."
+                    },
+                    {
+                        question: "The adjugate matrix is used to compute:",
+                        answer: "B",
+                        explanation: "The adjugate (or adjoint) matrix is used in the formula for matrix inversion: A⁻¹ = adj(A)/|A|. The adjugate is the transpose of the cofactor matrix, where each element is the determinant of the appropriate minor with alternating signs. While not the most efficient computational method for large matrices, this relationship is theoretically important and useful for symbolic calculations and understanding the structure of matrix inverses."
+                    }
+                ]
+            },
+            'eigenvalues-eigenvectors': {
+                title: '🎪 Eigenvalues & Eigenvectors',
+                description: 'Eigenvalue problems, diagonalization, and spectral analysis',
+                questions: [
+                    {
+                        question: "What defines an eigenvector of matrix A?",
+                        answer: "A",
+                        explanation: "An eigenvector x of matrix A is a non-zero vector that satisfies A x = λ x, where λ is the corresponding eigenvalue. This means that when the matrix A acts on the eigenvector x, it only scales the vector by the factor λ without changing its direction (unless λ is negative, which reverses the direction). Eigenvectors and eigenvalues are fundamental in understanding linear transformations, stability analysis, principal component analysis, and many other applications in mathematics and engineering."
+                    },
+                    {
+                        question: "For a diagonal matrix, where are the eigenvalues located?",
+                        answer: "A",
+                        explanation: "In a diagonal matrix, the eigenvalues are simply the entries on the main diagonal. This is because when you apply the matrix to a standard basis vector, it gets scaled by the corresponding diagonal entry. Diagonal matrices are particularly simple to work with because their eigenvalues are immediately visible, and the standard basis vectors serve as eigenvectors. This property makes diagonal matrices computationally efficient and theoretically important in linear algebra."
+                    },
+                    {
+                        question: "What are the eigenvalues of the diagonal matrix [[2,0],[0,3]]?",
+                        answer: "A",
+                        explanation: "For diagonal matrices, the eigenvalues are simply the entries on the main diagonal. This is because the standard basis vectors are eigenvectors: [[2,0],[0,3]] × [1,0] = 2×[1,0] and [[2,0],[0,3]] × [0,1] = 3×[0,1]. Diagonal matrices are the simplest case of eigenvalue problems and represent the 'goal' of diagonalization, where complex matrices are transformed into this simple form for easier analysis."
+                    },
+                    {
+                        question: "The characteristic equation of matrix A is:",
+                        answer: "A",
+                        explanation: "The characteristic equation det(A - λI) = 0 is solved to find eigenvalues λ. This polynomial equation of degree n (for n×n matrix) has roots that are the eigenvalues. The characteristic polynomial encodes important information about the matrix, including trace (sum of roots) and determinant (product of roots). Solving this equation is the first step in eigenvalue analysis for understanding system dynamics and stability."
+                    },
+                    {
+                        question: "If A has eigenvalues 1 and -1, what are the eigenvalues of A²?",
+                        answer: "B",
+                        explanation: "If A has eigenvalues λ, then A² has eigenvalues λ². For eigenvalues 1 and -1, we get 1² = 1 and (-1)² = 1. This follows from the fact that if Ax = λx, then A²x = A(λx) = λ(Ax) = λ²x. This property extends to any power: Aⁿ has eigenvalues λⁿ, which is crucial for understanding the long-term behavior of iterative processes and matrix powers in dynamical systems."
+                    },
+                    {
+                        question: "Diagonalization expresses matrix A as:",
+                        answer: "A",
+                        explanation: "Diagonalization writes A = PDP⁻¹, where D is diagonal containing eigenvalues and P has corresponding eigenvectors as columns. This representation reveals the 'true nature' of the linear transformation by showing it as simple scaling along eigenvector directions. Diagonalization is possible when A has n linearly independent eigenvectors and is crucial for computing matrix powers, solving differential equations, and understanding system dynamics efficiently."
+                    },
+                    {
+                        question: "A matrix is diagonalizable if it has:",
+                        answer: "A",
+                        explanation: "A square n×n matrix is diagonalizable if and only if it has n linearly independent eigenvectors. This ensures that the matrix P in A = PDP⁻¹ is invertible. Not all matrices are diagonalizable (e.g., some have repeated eigenvalues with geometric multiplicity less than algebraic multiplicity), but when possible, diagonalization greatly simplifies matrix analysis and computation in applications ranging from engineering to data science."
+                    },
+                    {
+                        question: "The spectral theorem applies to:",
+                        answer: "A",
+                        explanation: "The spectral theorem states that symmetric matrices can be diagonalized by orthogonal matrices: A = QDQ^T where Q has orthonormal columns. This is stronger than general diagonalization because the eigenvectors are orthogonal, making the decomposition particularly stable and meaningful. The spectral theorem is fundamental in optimization, principal component analysis, and understanding quadratic forms in machine learning and statistics."
+                    },
+                    {
+                        question: "For the matrix A = [[0,1],[1,0]], what are the eigenvectors?",
+                        answer: "A",
+                        explanation: "To find eigenvectors, solve (A - λI)x = 0 for each eigenvalue. For this matrix, eigenvalues are λ = 1 and λ = -1. For λ = 1: [[-1,1],[1,-1]]x = 0 gives eigenvector [1,1]. For λ = -1: [[1,1],[1,1]]x = 0 gives eigenvector [1,-1]. These represent the directions that are preserved (up to scaling) under the transformation, which geometrically is a reflection about the line y = x."
+                    },
+                    {
+                        question: "The largest eigenvalue in absolute value is called the:",
+                        answer: "A",
+                        explanation: "The spectral radius ρ(A) is the largest absolute value among all eigenvalues of A. It's crucial for understanding the long-term behavior of iterative processes and the convergence of matrix powers. For example, if ρ(A) < 1, then A^n → 0 as n → ∞. The spectral radius determines stability in dynamical systems and convergence rates in numerical methods, making it essential for analyzing system behavior in control theory and numerical analysis."
+                    }
+                ]
+            },
+            'calculus-basics': {
+                title: '📈 Calculus Fundamentals',
+                description: 'Derivatives, limits, and basic differentiation techniques',
+                questions: [
+                    {
+                        question: "What is the derivative of the linear function f(x) = 3x + 2?",
+                        answer: "B",
+                        explanation: "The derivative of a linear function f(x) = mx + c is simply the slope m. For f(x) = 3x + 2, the coefficient of x is 3, so f'(x) = 3. This represents the constant rate of change of the function - for every unit increase in x, the function increases by 3 units. Linear functions have constant derivatives, which geometrically represents the constant slope of the straight line. This is one of the most fundamental derivatives in calculus."
+                    },
+                    {
+                        question: "What does the power rule state for differentiation?",
+                        answer: "A",
+                        explanation: "The power rule is one of the most fundamental rules in calculus: the derivative of xⁿ is n·xⁿ⁻¹, where n can be any real number. This rule applies to all powers of x, including negative and fractional exponents. For example, d/dx(x³) = 3x², d/dx(x⁻¹) = -x⁻², and d/dx(√x) = ½x⁻½. The power rule is the foundation for differentiating polynomial functions and is combined with other rules to handle more complex functions."
+                    },
+                    {
+                        question: "What is the derivative of sin(x)?",
+                        answer: "A",
+                        explanation: "The derivative of sin(x) is cos(x). This relationship shows how the rate of change of the sine function corresponds to the cosine function. Geometrically, this means that the slope of the sine curve at any point equals the value of the cosine at that point. This is one of the fundamental trigonometric derivatives and is essential in calculus, physics (especially wave mechanics and oscillations), and engineering applications involving periodic phenomena."
+                    },
+                    {
+                        question: "For the exponential function f(x) = eˣ, what is special about its derivatives?",
+                        answer: "A",
+                        explanation: "The exponential function eˣ has the unique property that all of its derivatives are equal to itself: d/dx(eˣ) = eˣ, d²/dx²(eˣ) = eˣ, and so on. This makes eˣ the solution to the differential equation dy/dx = y, which appears frequently in natural phenomena like population growth, radioactive decay, and compound interest. This self-replicating property under differentiation makes the exponential function incredibly important in mathematics, physics, and engineering."
+                    },
+                    {
+                        question: "When is the chain rule used in differentiation?",
+                        answer: "B",
+                        explanation: "The chain rule is used to differentiate composite functions - functions of the form f(g(x)) where one function is nested inside another. The rule states that d/dx[f(g(x))] = f'(g(x))·g'(x). This means you differentiate the outer function (keeping the inner function unchanged), then multiply by the derivative of the inner function. The chain rule is essential for differentiating complex expressions and appears in most advanced calculus problems involving nested functions."
+                    },
+                    {
+                        question: "What is the derivative of ln(x)?",
+                        answer: "A",
+                        explanation: "The derivative of the natural logarithm ln(x) is 1/x. This fundamental result shows that the logarithmic function has a derivative that decreases as x increases, which explains the characteristic shape of the logarithmic curve. This derivative is crucial in calculus and appears frequently in integration (as the antiderivative of 1/x), in solving differential equations, and in many applications involving exponential growth and decay processes."
+                    },
+                    {
+                        question: "Using the limit definition, find the derivative of f(x) = √x at x = 4.",
+                        answer: "A",
+                        explanation: "Using f'(4) = lim[h→0] (√(4+h) - 2)/h, we rationalize the numerator by multiplying by (√(4+h) + 2)/(√(4+h) + 2). This gives lim[h→0] h/[h(√(4+h) + 2)] = lim[h→0] 1/(√(4+h) + 2) = 1/(2+2) = 1/4. This demonstrates the fundamental limit process that defines derivatives and shows how rationalization techniques help evaluate indeterminate forms."
+                    },
+                    {
+                        question: "The derivative of f(x) = sin(x)/x is:",
+                        answer: "A",
+                        explanation: "Using the quotient rule: if f(x) = u(x)/v(x), then f'(x) = (u'v - uv')/v². Here u = sin(x), u' = cos(x), v = x, v' = 1. Therefore f'(x) = (x cos(x) - sin(x))/x². The quotient rule is essential when differentiating ratios of functions, and this particular function appears frequently in physics and engineering applications, especially in signal processing and wave analysis."
+                    }
+                ]
+            },
+            'advanced-calculus': {
+                title: '🎢 Advanced Calculus',
+                description: 'Critical points, optimization, Taylor series, and applications',
+                questions: [
+                    {
+                        question: "A car's speed is modeled by v(t) = 3t² - 4t + 5 (m/s). What is its acceleration at t = 2 seconds?",
+                        answer: "A",
+                        explanation: "Acceleration is the derivative of velocity: a(t) = v'(t) = 6t - 4. At t = 2, a(2) = 6(2) - 4 = 8 m/s². This represents how quickly the speed is changing at that specific moment. The calculation involves applying the power rule to each term of the velocity function, then substituting the given time value to find the instantaneous acceleration."
+                    },
+                    {
+                        question: "The function f(x) = x³ - 6x² + 9x has critical points at:",
+                        answer: "A",
+                        explanation: "Critical points occur where f'(x) = 0. Taking the derivative: f'(x) = 3x² - 12x + 9. Setting equal to zero and factoring: 3(x² - 4x + 3) = 3(x-1)(x-3) = 0. This gives x = 1 and x = 3. These points are candidates for local maxima, minima, or inflection points, requiring further analysis with the second derivative test to classify their nature."
+                    },
+                    {
+                        question: "For f(x) = ln(3x² + 1), what is f'(1)?",
+                        answer: "A",
+                        explanation: "Using the chain rule: f'(x) = 1/(3x² + 1) · d/dx(3x² + 1) = 6x/(3x² + 1). At x = 1: f'(1) = 6(1)/(3(1)² + 1) = 6/4 = 3/2. The chain rule is essential here because we have a composition of the natural logarithm function with a quadratic polynomial. This type of derivative appears frequently in calculus applications involving logarithmic functions of polynomials."
+                    },
+                    {
+                        question: "The linear approximation of f(x) = e^(2x) near x = 0 is:",
+                        answer: "A",
+                        explanation: "Linear approximation uses L(x) = f(0) + f'(0)x. For f(x) = e^(2x): f(0) = e^0 = 1 and f'(x) = 2e^(2x), so f'(0) = 2. Therefore L(x) = 1 + 2x. This tangent line approximation is useful for estimating function values near x = 0 and represents the first-order Taylor polynomial. It provides a simple linear function that closely approximates the exponential function for small values of x."
+                    },
+                    {
+                        question: "The inflection point of f(x) = x³ - 3x² occurs at:",
+                        answer: "A",
+                        explanation: "Inflection points occur where f''(x) = 0 and the concavity changes. For f(x) = x³ - 3x², f'(x) = 3x² - 6x, and f''(x) = 6x - 6. Setting f''(x) = 0: 6x - 6 = 0, so x = 1. We can verify that concavity changes at this point by checking the sign of f''(x) on either side of x = 1. This point represents where the curve changes from concave down to concave up."
+                    },
+                    {
+                        question: "The average rate of change of f(x) = x² on [1, 3] is:",
+                        answer: "A",
+                        explanation: "The average rate of change over an interval [a,b] is [f(b) - f(a)]/(b - a). For f(x) = x² on [1,3]: f(3) = 9, f(1) = 1, so the average rate = (9 - 1)/(3 - 1) = 8/2 = 4. This represents the slope of the secant line connecting the points (1,1) and (3,9) on the graph. It gives the overall rate of change over the entire interval, which differs from instantaneous rates at specific points."
+                    },
+                    {
+                        question: "The function f(x) = x⁴ - 4x³ has a local minimum at:",
+                        answer: "A",
+                        explanation: "To find local extrema, find critical points where f'(x) = 0: f'(x) = 4x³ - 12x² = 4x²(x - 3) = 0. This gives x = 0 and x = 3. Using the second derivative test: f''(x) = 12x² - 24x. At x = 3: f''(3) = 12(9) - 24(3) = 108 - 72 = 36 > 0, confirming a local minimum. At x = 0: f''(0) = 0, requiring further analysis to determine the nature of this critical point."
+                    },
+                    {
+                        question: "The Taylor series expansion of f(x) = cos(x) about x = 0 up to x² is:",
+                        answer: "A",
+                        explanation: "The Taylor series for cos(x) about x = 0 is: cos(x) = 1 - x²/2! + x⁴/4! - ... The first three non-zero terms are: 1 - x²/2 + 0·x (since the derivative of cos(x) at x = 0 gives: f(0) = 1, f'(0) = 0, f''(0) = -1). This series provides excellent approximations for small values of x and is fundamental in mathematical analysis and numerical computations."
+                    }
+                ]
+            },
+            'multivariable-calculus': {
+                title: '🌐 Multivariable Calculus',
+                description: 'Partial derivatives, gradients, and optimization in multiple dimensions',
+                questions: [
+                    {
+                        question: "For f(x,y) = x²y + sin(y), what is ∂²f/∂x∂y?",
+                        answer: "A",
+                        explanation: "To find the mixed partial derivative, first find ∂f/∂y = x² + cos(y), then differentiate with respect to x: ∂²f/∂x∂y = ∂/∂x(x² + cos(y)) = 2x. The cosine term disappears because cos(y) is constant with respect to x. Mixed partial derivatives measure how the rate of change in one direction varies as we move in another direction. For functions with continuous mixed partials, the order of differentiation doesn't matter (Clairaut's theorem)."
+                    },
+                    {
+                        question: "The directional derivative of f(x,y) = xy at (1,2) in direction v = (1,1) is:",
+                        answer: "A",
+                        explanation: "The directional derivative is ∇f · (v/|v|). First, ∇f = (∂f/∂x, ∂f/∂y) = (y, x) = (2, 1) at point (1,2). The unit vector in direction (1,1) is (1,1)/√2. Therefore: (2,1) · (1,1)/√2 = (2+1)/√2 = 3/√2. This measures the rate of change of f in the specified direction, which differs from the maximum rate given by the gradient magnitude."
+                    },
+                    {
+                        question: "The Jacobian determinant of transformation (x,y) → (u,v) = (x+y, x-y) is:",
+                        answer: "A",
+                        explanation: "The Jacobian matrix is J = [[∂u/∂x, ∂u/∂y], [∂v/∂x, ∂v/∂y]] = [[1,1], [1,-1]]. The determinant is |J| = (1)(-1) - (1)(1) = -1 - 1 = -2. This value represents the area scaling factor when transforming from (x,y) coordinates to (u,v) coordinates, with the negative sign indicating orientation reversal. The Jacobian determinant is crucial in change of variables formulas for multiple integrals."
+                    },
+                    {
+                        question: "The gradient of f(x,y,z) = xyz at (1,1,1) is:",
+                        answer: "A",
+                        explanation: "The gradient ∇f = (∂f/∂x, ∂f/∂y, ∂f/∂z) = (yz, xz, xy). At the point (1,1,1): ∇f = (1·1, 1·1, 1·1) = (1,1,1). The gradient points in the direction of steepest increase of the function and its components give the rates of change along each coordinate direction. At this symmetric point, the function increases equally fast in all three coordinate directions."
+                    },
+                    {
+                        question: "The Lagrange multiplier method is used to:",
+                        answer: "A",
+                        explanation: "Lagrange multipliers provide a method for finding extrema of a function f(x,y) subject to constraint g(x,y) = c. The method finds points where ∇f = λ∇g, where λ is the Lagrange multiplier. This technique is essential in optimization problems where we need to find maximum or minimum values while satisfying certain constraints, commonly used in economics for utility maximization, engineering for design optimization, and physics for equilibrium problems."
+                    }
+                ]
+            },
+            'probability-statistics': {
+                title: '📊 Probability & Statistics',
+                description: 'Fundamental concepts in probability theory and statistical analysis',
+                questions: [
+                    {
+                        question: "A fair coin is flipped 3 times. The probability of getting exactly 2 heads is:",
+                        answer: "A",
+                        explanation: "This is a binomial probability problem: P(X = 2) = C(3,2) × (1/2)² × (1/2)¹ = 3 × (1/4) × (1/2) = 3/8. There are C(3,2) = 3 ways to choose which 2 flips are heads: HHT, HTH, THH. Each specific sequence has probability (1/2)³ = 1/8, so the total probability is 3 × 1/8 = 3/8. This demonstrates the binomial distribution for counting successes in independent trials."
+                    },
+                    {
+                        question: "If P(A) = 0.3, P(B) = 0.4, and A and B are independent, what is P(A ∪ B)?",
+                        answer: "A",
+                        explanation: "For independent events: P(A ∪ B) = P(A) + P(B) - P(A ∩ B) = P(A) + P(B) - P(A)P(B) = 0.3 + 0.4 - (0.3)(0.4) = 0.7 - 0.12 = 0.58. Independence means P(A ∩ B) = P(A)P(B), which we subtract to avoid double-counting the intersection when adding the individual probabilities. This formula applies the inclusion-exclusion principle for probability."
+                    },
+                    {
+                        question: "The probability density function (PDF) of a continuous random variable satisfies:",
+                        answer: "A",
+                        explanation: "A probability density function must integrate to 1 over its entire domain: ∫_{-∞}^{∞} f(x) dx = 1. This ensures that the total probability equals 1. While f(x) ≥ 0 everywhere, it can exceed 1 for some values of x, as long as the total area under the curve equals 1. This is a fundamental requirement for any valid PDF and distinguishes it from probability mass functions for discrete variables."
+                    },
+                    {
+                        question: "In a standard normal distribution, P(Z ≤ 1.96) is approximately:",
+                        answer: "A",
+                        explanation: "From standard normal tables, P(Z ≤ 1.96) ≈ 0.975. This is a critical value in statistics: it means that 97.5% of the area under the standard normal curve lies to the left of z = 1.96. This value is frequently used in confidence intervals and hypothesis testing, particularly for 95% confidence intervals where we use ±1.96 to capture the middle 95% of the distribution, leaving 2.5% in each tail."
+                    },
+                    {
+                        question: "Bayes' Theorem is applied to update probabilities based on:",
+                        answer: "A",
+                        explanation: "Bayes' Theorem provides a framework for updating prior beliefs when new evidence becomes available. It combines prior probabilities P(A) with observed evidence P(B|A) to calculate posterior probabilities P(A|B). This makes it invaluable in medical diagnosis (updating disease probability based on test results), machine learning (updating model parameters), spam filtering, and any situation where we need to revise our estimates based on new information."
+                    },
+                    {
+                        question: "What is the standard deviation if the variance is 9?",
+                        answer: "B",
+                        explanation: "Standard deviation is the square root of variance. If variance = 9, then standard deviation = √9 = 3. Standard deviation measures the average amount of variability or dispersion in a dataset from the mean, expressed in the same units as the original data. It provides a more interpretable measure of spread compared to variance because it's not squared. A standard deviation of 3 means most data points typically fall within 3 units of the mean."
+                    },
+                    {
+                        question: "What is the coefficient of determination (R²) used to measure?",
+                        answer: "B",
+                        explanation: "The coefficient of determination (R²) measures how well a regression model fits the observed data, representing the proportion of variance in the dependent variable that is predictable from the independent variables. R² values range from 0 to 1, where 0 indicates no linear relationship and 1 indicates perfect fit. For example, R² = 0.85 means 85% of the variation in the dependent variable is explained by the model, making it a crucial metric for evaluating regression model performance."
+                    },
+                    {
+                        question: "In hypothesis testing, what does a p-value represent?",
+                        answer: "B",
+                        explanation: "A p-value represents the probability of obtaining test results at least as extreme as the observed results, assuming the null hypothesis is true. It quantifies the strength of evidence against the null hypothesis - smaller p-values indicate stronger evidence against it. For example, p = 0.03 means there's a 3% chance of observing such extreme results if the null hypothesis were actually true. P-values help researchers make decisions about whether to reject the null hypothesis at chosen significance levels."
+                    }
+                ]
+            },
+            'computer-systems': {
+                title: '💻 Computer Systems',
+                description: 'Basic computer hardware concepts and system components',
+                questions: [
+                    {
+                        question: "What does CPU stand for in computer systems?",
+                        answer: "A",
+                        explanation: "CPU stands for Central Processing Unit, which is the primary component of a computer that performs most of the processing inside the computer. It executes instructions from programs by performing basic arithmetic, logic, control, and input/output operations specified by the instructions. The CPU is often called the 'brain' of the computer because it coordinates and controls all other components. Modern CPUs contain multiple cores that can execute multiple instructions simultaneously, greatly improving computational performance."
+                    },
+                    {
+                        question: "What is the purpose of RAM in computer systems?",
+                        answer: "B",
+                        explanation: "RAM (Random Access Memory) serves as temporary storage for data and programs that are currently being used by the CPU. Unlike permanent storage devices like hard drives, RAM is volatile memory that loses its contents when power is turned off. It provides much faster access to data compared to storage devices, allowing the CPU to quickly retrieve and modify information. The amount and speed of RAM significantly impacts system performance because more RAM allows more programs to run simultaneously without slowdown from disk access."
+                    }
+                ]
+            },
+            'special-applications': {
+                title: '🚀 Special Applications',
+                description: 'Specialized applications and advanced topics',
+                questions: [
+                    {
+                        question: "In robotics, eigenvalues are used to analyze:",
+                        answer: "A",
+                        explanation: "Eigenvalues of the Jacobian matrix in robotics determine the stability and behavior of control systems. Near equilibrium points, the system's linearization has behavior determined by eigenvalues: negative real parts indicate stability, positive parts indicate instability, and complex parts indicate oscillatory behavior. This analysis is crucial for designing stable robot controllers and understanding workspace singularities where the robot loses degrees of freedom, affecting manipulation capabilities."
+                    },
+                    {
+                        question: "Eigenvectors corresponding to distinct eigenvalues are:",
+                        answer: "A",
+                        explanation: "For symmetric matrices, eigenvectors corresponding to distinct eigenvalues are orthogonal. More generally, eigenvectors corresponding to distinct eigenvalues are always linearly independent. This property is fundamental in diagonalization and spectral theory. The orthogonality property for symmetric matrices makes them particularly nice to work with and leads to the spectral theorem, which has important applications in principal component analysis and quantum mechanics."
+                    },
+                    {
+                        question: "A Markov matrix has eigenvalues that satisfy:",
+                        answer: "A",
+                        explanation: "Markov matrices (stochastic matrices with non-negative entries and row sums equal to 1) have all eigenvalues satisfying |λ| ≤ 1, with at least one eigenvalue equal to 1. This property ensures that the system represented by the matrix eventually reaches a steady state and doesn't exhibit explosive behavior. The largest eigenvalue of 1 corresponds to the steady-state distribution in probability applications like PageRank algorithms."
+                    }
+                ]
+            }
+        };
+
+        let currentTopic = '';
+        let allQuestions = [];
+        let questionCounter = 0;
+
+        // Flatten all questions for search
+        Object.keys(topics).forEach(topicKey => {
+            topics[topicKey].questions.forEach(q => {
+                questionCounter++;
+                allQuestions.push({...q, topic: topicKey, topicTitle: topics[topicKey].title, id: questionCounter});
+            });
+        });
+
+        // Render topics in sidebar
+        function renderTopics() {
+            const topicList = document.getElementById('topicList');
+            topicList.innerHTML = '';
+            
+            Object.keys(topics).forEach(topicKey => {
+                const topic = topics[topicKey];
+                const li = document.createElement('li');
+                li.className = 'topic-item';
+                li.innerHTML = `
+                    <button class="topic-button" data-topic="${topicKey}">
+                        <span class="topic-text">${topic.title}</span>
+                        <span class="topic-count">${topic.questions.length}</span>
+                    </button>
+                `;
+                topicList.appendChild(li);
+            });
+
+            // Add event listeners
+            document.querySelectorAll('.topic-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const topicKey = button.getAttribute('data-topic');
+                    showTopic(topicKey);
+                });
+            });
+        }
+
+        // Show questions for a specific topic
+        function showTopic(topicKey) {
+            currentTopic = topicKey;
+            const topic = topics[topicKey];
+            
+            // Update active topic
+            document.querySelectorAll('.topic-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-topic="${topicKey}"]`).classList.add('active');
+            
+            // Update header
+            const mainContent = document.getElementById('mainContent');
+            mainContent.innerHTML = `
+                <div class="content-header">
+                    <h2 class="topic-title">${topic.title}</h2>
+                    <p class="topic-description">${topic.description}</p>
+                </div>
+                <div class="questions-container active">
+                    ${renderQuestions(topic.questions)}
+                </div>
+            `;
+
+            // Add click handlers for questions
+            addQuestionHandlers();
+        }
+
+        // Render questions
+        function renderQuestions(questions) {
+            if (questions.length === 0) {
+                return '<div class="no-questions">No questions found matching your search.</div>';
+            }
+            
+            return questions.map((q, index) => `
+                <div class="question-card" data-question-id="${q.id || index}">
+                    <div class="question-header">
+                        <div class="question-number">Question ${q.id || index + 1}</div>
+                        <div class="question-text">${q.question}</div>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="question-content">
+                        <div class="answer-section">
+                            <div class="correct-answer">
+                                <strong>Correct Answer:</strong> ${q.answer}
+                            </div>
+                            <div class="explanation">
+                                <span class="explanation-label">Explanation:</span>
+                                ${q.explanation}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Add question click handlers
+        function addQuestionHandlers() {
+            document.querySelectorAll('.question-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const card = header.closest('.question-card');
+                    const content = card.querySelector('.question-content');
+                    
+                    card.classList.toggle('active');
+                    content.classList.toggle('active');
+                });
+            });
+        }
+
+        // Search functionality
+        function setupSearch() {
+            const searchBox = document.getElementById('searchBox');
+            searchBox.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                
+                if (query === '') {
+                    if (currentTopic) {
+                        showTopic(currentTopic);
+                    } else {
+                        showWelcome();
+                    }
+                    return;
+                }
+                
+                const filteredQuestions = allQuestions.filter(q => 
+                    q.question.toLowerCase().includes(query) ||
+                    q.explanation.toLowerCase().includes(query) ||
+                    q.topicTitle.toLowerCase().includes(query)
+                );
+                
+                // Show search results
+                const mainContent = document.getElementById('mainContent');
+                mainContent.innerHTML = `
+                    <div class="content-header">
+                        <h2 class="topic-title">Search Results</h2>
+                        <p class="topic-description">Found ${filteredQuestions.length} questions matching "${query}"</p>
+                    </div>
+                    <div class="questions-container active">
+                        ${renderQuestions(filteredQuestions.map(q => ({
+                            ...q,
+                            question: highlightText(q.question, query),
+                            explanation: highlightText(q.explanation, query)
+                        })))}
+                    </div>
+                `;
+                
+                addQuestionHandlers();
+            });
+        }
+
+        // Highlight search terms
+        function highlightText(text, query) {
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        // Show welcome message
+        function showWelcome() {
+            const mainContent = document.getElementById('mainContent');
+            mainContent.innerHTML = `
+                <div class="welcome-message">
+                    <h2>Welcome to Mathematics Learning Hub! 📈</h2>
+                    <p>Master essential mathematics concepts through carefully organized topics. Start with vector algebra and progress through each section to build your understanding step by step. Each topic builds upon the previous ones, creating a comprehensive learning journey from basic algebra to advanced topics.</p>
+                </div>
+            `;
+            currentTopic = '';
+            document.querySelectorAll('.topic-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTopics();
+            setupSearch();
+        });
+    </script>
+</body>
+</html>
